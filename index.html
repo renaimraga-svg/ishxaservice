@@ -13,7 +13,7 @@
                     colors: {
                         darkbg: '#0b0f19',
                         cardbg: '#131c2e',
-                        accent: '#10b981', /* Neon Green */
+                        accent: '#10b981',
                         accenthover: '#059669',
                     }
                 }
@@ -48,7 +48,7 @@
                 Accounts, Currency & Rare Items
             </h1>
             <p class="text-gray-400 text-base sm:text-lg max-w-xl mx-auto">
-                Instant delivery, secure transactions, and top-tier services for hardcore gamers. Fast and reliable.
+                Instant delivery, safe & trusted service. Юу хүссэнээ найдвартай аваарай! Fast and secure.
             </p>
         </div>
     </section>
@@ -57,7 +57,7 @@
     <main id="products" class="max-w-6xl mx-auto px-4 py-12">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
             <h2 class="text-2xl font-bold text-white flex items-center gap-2">
-                <i class="fas fa-store text-accent"></i> Available Offers
+                <i class="fas fa-store text-accent"></i> Available Offers / Боломжит бараанууд
             </h2>
             <!-- Filter Pills -->
             <div class="flex flex-wrap gap-2">
@@ -79,11 +79,11 @@
                         <span class="text-xl font-black text-accent">₮15,000</span>
                     </div>
                     <h3 class="text-lg font-bold text-white">Max Level Blox Fruits Account (V4 Unlocked)</h3>
-                    <p class="text-gray-400 text-sm">Comes with Godhuman, Cursed Dual Katana, and rare gamepasses loaded.</p>
+                    <p class="text-gray-400 text-sm">Godhuman, Cursed Dual Katana, full loaded. Маш цэвэрхэн аккаунт.</p>
                 </div>
                 <div class="p-5 pt-0">
                     <a href="https://t.me/yourtelegram?text=I%20want%20to%20buy%20Max%20Level%20Blox%20Fruits%20Account" target="_blank" class="w-full block text-center bg-gray-800 hover:bg-accent hover:text-darkbg text-white font-semibold py-2.5 rounded-xl transition duration-200">
-                        Buy via Telegram <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        Telegram-аар авах <i class="fas fa-arrow-right ml-1 text-xs"></i>
                     </a>
                 </div>
             </div>
@@ -96,11 +96,11 @@
                         <span class="text-xl font-black text-accent">₮5,000</span>
                     </div>
                     <h3 class="text-lg font-bold text-white">50M In-Game Cash / Gold Bundle</h3>
-                    <p class="text-gray-400 text-sm">Instant fast trade delivery within 5 minutes of payment confirmation.</p>
+                    <p class="text-gray-400 text-sm">Шууд trade хийгээд өгнө. Fast delivery within 5 mins!</p>
                 </div>
                 <div class="p-5 pt-0">
                     <a href="https://t.me/yourtelegram?text=I%20want%20to%20buy%2050M%20Cash%20Bundle" target="_blank" class="w-full block text-center bg-gray-800 hover:bg-accent hover:text-darkbg text-white font-semibold py-2.5 rounded-xl transition duration-200">
-                        Buy via Telegram <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        Telegram-аар авах <i class="fas fa-arrow-right ml-1 text-xs"></i>
                     </a>
                 </div>
             </div>
@@ -113,11 +113,11 @@
                         <span class="text-xl font-black text-accent">₮8,500</span>
                     </div>
                     <h3 class="text-lg font-bold text-white">Legendary Weapon / Skin Pack</h3>
-                    <p class="text-gray-400 text-sm">Exclusive seasonal drop item with unmatched stats and visual effects.</p>
+                    <p class="text-gray-400 text-sm">Exclusive drop, ховорхон олдох item байгаа.</p>
                 </div>
                 <div class="p-5 pt-0">
                     <a href="https://t.me/yourtelegram?text=I%20want%20to%20buy%20Legendary%20Weapon" target="_blank" class="w-full block text-center bg-gray-800 hover:bg-accent hover:text-darkbg text-white font-semibold py-2.5 rounded-xl transition duration-200">
-                        Buy via Telegram <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        Telegram-аар авах <i class="fas fa-arrow-right ml-1 text-xs"></i>
                     </a>
                 </div>
             </div>
@@ -127,7 +127,7 @@
 
     <!-- Footer -->
     <footer class="border-t border-gray-800 mt-20 py-8 text-center text-gray-500 text-sm">
-        <p>&copy; 2026 Ishxa Service. All rights reserved. Built by Shirogami Ren.</p>
+        <p>&copy; 2026 Ishxa Service. All rights reserved. Powered by Shirogami Ren.</p>
     </footer>
 
     <!-- Simple Filtering Script -->
@@ -136,7 +136,6 @@
             const cards = document.querySelectorAll('.product-card');
             const buttons = document.querySelectorAll('.filter-btn');
 
-            // Update button styles
             buttons.forEach(btn => {
                 btn.classList.remove('bg-accent', 'text-darkbg');
                 btn.classList.add('bg-cardbg', 'text-gray-300');
@@ -144,7 +143,6 @@
             event.target.classList.remove('bg-cardbg', 'text-gray-300');
             event.target.classList.add('bg-accent', 'text-darkbg');
 
-            // Filter cards
             cards.forEach(card => {
                 if (category === 'all' || card.dataset.category === category) {
                     card.style.display = 'flex';
