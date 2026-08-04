@@ -55,30 +55,10 @@
         </div>
     </section>
 
-    <!-- Info Banner Section (Tsagiin Huviar & Busad Medeelel) -->
+    <!-- Tsagiin Huviar & Busad Medeelel Dynamic Container -->
     <section class="max-w-6xl mx-auto px-4 pt-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Tsagiin Huviar Card -->
-            <div class="bg-cardbg border border-gray-800 p-6 rounded-2xl relative overflow-hidden flex items-start gap-4">
-                <div class="p-3 bg-accent/10 text-accent rounded-xl border border-accent/20">
-                    <i class="fas fa-clock text-xl"></i>
-                </div>
-                <div class="space-y-1">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-accent">Цагийн хуваарь (Working Hours)</h3>
-                    <p id="display-schedule" class="text-gray-300 text-sm whitespace-pre-line">Loading...</p>
-                </div>
-            </div>
-
-            <!-- Busad Medeelel Card -->
-            <div class="bg-cardbg border border-gray-800 p-6 rounded-2xl relative overflow-hidden flex items-start gap-4">
-                <div class="p-3 bg-blue-500/10 text-blue-400 rounded-xl border border-blue-500/20">
-                    <i class="fas fa-info-circle text-xl"></i>
-                </div>
-                <div class="space-y-1">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-blue-400">Бусад мэдээлэл (Other Info)</h3>
-                    <p id="display-info" class="text-gray-300 text-sm whitespace-pre-line">Loading...</p>
-                </div>
-            </div>
+        <div id="dynamic-info-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Populated via JavaScript -->
         </div>
     </section>
 
@@ -108,20 +88,33 @@
                 <button onclick="toggleAdminModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
             </div>
 
-            <!-- Site Info Settings (Tsagiin Huviar & Busad Medeelel) -->
+            <!-- Manage Tsagiin Huviar & Busad Medeelel Items -->
             <div class="bg-darkbg/50 p-4 rounded-xl border border-gray-800 space-y-4">
-                <h4 class="font-semibold text-accent text-sm uppercase tracking-wider">Edit Site Info (Цагийн хуваарь & Бусад мэдээлэл)</h4>
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Цагийн хуваарь (Schedule)</label>
-                        <textarea id="setting-schedule" rows="2" class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="e.g. Даваа - Ням: 09:00 - 23:00"></textarea>
+                <h4 class="font-semibold text-accent text-sm uppercase tracking-wider">Manage Info Cards (Цагийн хуваарь & Бусад мэдээлэл)</h4>
+                
+                <!-- Add New Info Card Form -->
+                <form onsubmit="handleAddNewInfoCard(event)" class="space-y-3 border-b border-gray-800 pb-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Title (гарчиг)</label>
+                            <input type="text" id="info-title" required class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="e.g. Цагийн хуваарь">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Icon (FontAwesome class)</label>
+                            <input type="text" id="info-icon" required value="fas fa-clock" class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="fas fa-clock">
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Бусад мэдээлэл (Other Info / Notices)</label>
-                        <textarea id="setting-info" rows="2" class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="e.g. Баталгаат хугацаа болон бусад анхааруулга..."></textarea>
+                        <label class="block text-xs text-gray-400 mb-1">Content (утга)</label>
+                        <textarea id="info-content" rows="2" required class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="Дэлгэрэнгүй мэдээлэл..."></textarea>
                     </div>
+                    <button type="submit" class="w-full bg-accent text-darkbg font-bold py-2 rounded-lg text-sm hover:bg-accenthover transition">Add Info Card</button>
+                </form>
+
+                <!-- Existing Info Cards List for Editing/Deleting -->
+                <div id="admin-info-list" class="space-y-3 pt-2">
+                    <!-- Populated via JS -->
                 </div>
-                <button onclick="saveSiteInfoSettings()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 rounded-lg text-sm transition">Update Site Info</button>
             </div>
 
             <!-- Header Button Settings Form -->
@@ -259,29 +252,99 @@
             link: 'https://www.facebook.com'
         };
 
-        let siteInfo = JSON.parse(localStorage.getItem('ishxa_site_info')) || {
-            schedule: 'Даваа - Ням: 09:00 - 23:00 (Бүх өдөр ажиллана)',
-            info: 'Бүх үйлчилгээ болон аккаунт найдвартай, баталгаатай. Төлбөр шилжүүлсний дараа шууд мэдээллээ авна.'
-        };
+        let infoCards = JSON.parse(localStorage.getItem('ishxa_info_cards')) || [
+            {
+                id: 1,
+                title: 'Цагийн хуваарь (Working Hours)',
+                icon: 'fas fa-clock',
+                content: 'Даваа - Ням: 09:00 - 23:00 (Бүх өдөр ажиллана)'
+            },
+            {
+                id: 2,
+                title: 'Бусад мэдээлэл (Other Info)',
+                icon: 'fas fa-info-circle',
+                content: 'Бүх үйлчилгээ болон аккаунт найдвартай, баталгаатай. Төлбөр шилжүүлсний дараа шууд мэдээллээ авна.'
+            }
+        ];
 
         let currentFilter = 'all';
 
-        function applySiteInfo() {
-            document.getElementById('display-schedule').textContent = siteInfo.schedule;
-            document.getElementById('display-info').textContent = siteInfo.info;
+        function renderInfoCards() {
+            const container = document.getElementById('dynamic-info-container');
+            container.innerHTML = '';
 
-            document.getElementById('setting-schedule').value = siteInfo.schedule;
-            document.getElementById('setting-info').value = siteInfo.info;
+            if(infoCards.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center text-gray-500 py-4">No info cards added yet. Add them in the admin panel!</div>';
+                return;
+            }
+
+            infoCards.forEach(card => {
+                const div = document.createElement('div');
+                div.className = "bg-cardbg border border-gray-800 p-6 rounded-2xl relative overflow-hidden flex items-start gap-4";
+                div.innerHTML = `
+                    <div class="p-3 bg-accent/15 text-accent rounded-xl border border-accent/20">
+                        <i class="${card.icon || 'fas fa-info'} text-xl"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-accent">${card.title}</h3>
+                        <p class="text-gray-300 text-sm whitespace-pre-line">${card.content}</p>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
         }
 
-        function saveSiteInfoSettings() {
-            siteInfo = {
-                schedule: document.getElementById('setting-schedule').value.trim(),
-                info: document.getElementById('setting-info').value.trim()
+        function renderAdminInfoCards() {
+            const list = document.getElementById('admin-info-list');
+            list.innerHTML = '';
+
+            infoCards.forEach(card => {
+                const row = document.createElement('div');
+                row.className = "bg-darkbg p-3 rounded-lg border border-gray-800 space-y-2 text-sm";
+                row.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-white font-bold flex items-center gap-2"><i class="${card.icon}"></i> ${card.title}</span>
+                        <button onclick="deleteInfoCard(${card.id})" class="text-red-400 hover:text-red-300 px-2 py-1"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <textarea id="edit-info-content-${card.id}" rows="2" class="w-full bg-cardbg border border-gray-800 rounded px-2 py-1 text-xs text-gray-200 outline-none focus:border-accent">${card.content}</textarea>
+                    <button onclick="updateInfoCardContent(${card.id})" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-1 rounded text-xs transition">Save Changes</button>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        function handleAddNewInfoCard(e) {
+            e.preventDefault();
+            const newCard = {
+                id: Date.now(),
+                title: document.getElementById('info-title').value.trim(),
+                icon: document.getElementById('info-icon').value.trim(),
+                content: document.getElementById('info-content').value.trim()
             };
-            localStorage.setItem('ishxa_site_info', JSON.stringify(siteInfo));
-            applySiteInfo();
-            alert('Site info updated successfully!');
+            infoCards.push(newCard);
+            localStorage.setItem('ishxa_info_cards', JSON.stringify(infoCards));
+            renderInfoCards();
+            renderAdminInfoCards();
+            e.target.reset();
+            document.getElementById('info-icon').value = 'fas fa-clock';
+        }
+
+        function updateInfoCardContent(id) {
+            const newContent = document.getElementById(`edit-info-content-${id}`).value.trim();
+            infoCards = infoCards.map(c => {
+                if(c.id === id) c.content = newContent;
+                return c;
+            });
+            localStorage.setItem('ishxa_info_cards', JSON.stringify(infoCards));
+            renderInfoCards();
+            alert('Info card updated successfully!');
+        }
+
+        function deleteInfoCard(id) {
+            infoCards = infoCards.filter(c => c.id !== id);
+            localStorage.setItem('ishxa_info_cards', JSON.stringify(infoCards));
+            renderInfoCards();
+            renderAdminInfoCards();
         }
 
         function applyHeaderSettings() {
@@ -338,7 +401,6 @@
                 container.appendChild(btn);
             });
 
-            // Update category select dropdown in admin form
             const select = document.getElementById('p-category');
             select.innerHTML = '';
             categories.forEach(cat => {
@@ -351,7 +413,7 @@
 
         function renderProducts(filterCategory) {
             currentFilter = filterCategory;
-            renderCategories(); // Re-render to update active classes on pills
+            renderCategories();
 
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
@@ -480,8 +542,8 @@
             if(!modal.classList.contains('hidden')) {
                 renderAdminList();
                 renderAdminCategories();
+                renderAdminInfoCards();
                 applyHeaderSettings();
-                applySiteInfo();
             }
         }
 
@@ -489,7 +551,7 @@
             renderProducts(category);
         }
 
-        applySiteInfo();
+        renderInfoCards();
         applyHeaderSettings();
         renderCategories();
         renderProducts('all');
