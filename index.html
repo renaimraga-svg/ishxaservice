@@ -32,7 +32,8 @@
             </div>
             <div class="flex items-center space-x-4">
                 <a href="#products" class="text-sm font-medium hover:text-accent transition">Catalog</a>
-                <a href="https://www.facebook.com" target="_blank" class="bg-accent text-darkbg font-bold px-4 py-2 rounded-lg text-sm hover:bg-accenthover transition shadow-lg shadow-accent/20">
+                <!-- Dynamic Header Button -->
+                <a id="header-contact-btn" href="https://www.facebook.com" target="_blank" class="bg-accent text-darkbg font-bold px-4 py-2 rounded-lg text-sm hover:bg-accenthover transition shadow-lg shadow-accent/20">
                     <i class="fab fa-facebook-f mr-1"></i> Facebook
                 </a>
             </div>
@@ -81,6 +82,22 @@
             <div class="flex justify-between items-center border-b border-gray-800 pb-4">
                 <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-cogs text-accent"></i> Store Admin Panel</h3>
                 <button onclick="toggleAdminModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+
+            <!-- Header Button Settings Form -->
+            <div class="bg-darkbg/50 p-4 rounded-xl border border-gray-800 space-y-4">
+                <h4 class="font-semibold text-accent text-sm uppercase tracking-wider">Top Header Button Settings</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Button Text</label>
+                        <input type="text" id="setting-btn-text" class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="e.g. Facebook">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Redirect Link URL</label>
+                        <input type="url" id="setting-btn-link" class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="https://facebook.com/yourpage">
+                    </div>
+                </div>
+                <button onclick="saveHeaderSettings()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 rounded-lg text-sm transition">Update Header Button</button>
             </div>
 
             <!-- Add Product Form -->
@@ -180,6 +197,43 @@
             }
         ];
 
+        let headerSettings = JSON.parse(localStorage.getItem('ishxa_header')) || {
+            text: '<i class="fab fa-facebook-f mr-1"></i> Facebook',
+            link: 'https://www.facebook.com'
+        };
+
+        function applyHeaderSettings() {
+            const btn = document.getElementById('header-contact-btn');
+            btn.innerHTML = headerSettings.text;
+            btn.href = headerSettings.link;
+
+            document.getElementById('setting-btn-link').value = headerSettings.link;
+            // Strip HTML tags for clean editing in input field
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = headerSettings.text;
+            document.getElementById('setting-btn-text').value = tempDiv.textContent.trim() || 'Facebook';
+        }
+
+        function saveHeaderSettings() {
+            const rawText = document.getElementById('setting-btn-text').value;
+            const link = document.getElementById('setting-btn-link').value;
+            
+            // Keep facebook icon if it says facebook, otherwise regular text
+            let iconHtml = '<i class="fab fa-facebook-f mr-1"></i> ';
+            if(!rawText.toLowerCase().includes('facebook')) {
+                iconHtml = '';
+            }
+
+            headerSettings = {
+                text: iconHtml + rawText,
+                link: link || '#'
+            };
+
+            localStorage.setItem('ishxa_header', JSON.stringify(headerSettings));
+            applyHeaderSettings();
+            alert('Header button updated successfully!');
+        }
+
         function saveAndRender() {
             localStorage.setItem('ishxa_products', JSON.stringify(products));
             renderProducts('all');
@@ -268,6 +322,7 @@
             modal.classList.toggle('hidden');
             if(!modal.classList.contains('hidden')) {
                 renderAdminList();
+                applyHeaderSettings();
             }
         }
 
@@ -282,6 +337,7 @@
             renderProducts(category);
         }
 
+        applyHeaderSettings();
         renderProducts('all');
     </script>
 </body>
