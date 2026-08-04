@@ -27,8 +27,7 @@
     <header class="sticky top-0 z-50 bg-darkbg/90 backdrop-blur-md border-b border-gray-800">
         <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-2">
-                <!-- Double click logo to open admin panel instantly -->
-                <span class="text-2xl font-black tracking-wider text-white cursor-pointer select-none" ondblclick="toggleAdminModal()" title="Double-click for Admin">ISHXA<span class="text-accent">.</span>SERVICE</span>
+                <span class="text-2xl font-black tracking-wider text-white select-none">ISHXA<span class="text-accent">.</span>SERVICE</span>
             </div>
             <div class="flex items-center space-x-4">
                 <a href="#products" class="text-sm font-medium hover:text-accent transition">Catalog</a>
@@ -75,7 +74,7 @@
         </div>
     </main>
 
-    <!-- Admin Panel Modal (Hidden by default, opens on double-click) -->
+    <!-- Admin Panel Modal -->
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-cardbg border border-gray-800 w-full max-w-2xl rounded-2xl p-6 space-y-6 max-h-[90vh] overflow-y-auto shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-4">
@@ -128,8 +127,12 @@
     </div>
 
     <!-- Footer -->
-    <footer class="border-t border-gray-800 mt-20 py-8 text-center text-gray-500 text-sm">
+    <footer class="border-t border-gray-800 mt-20 py-8 text-center text-gray-500 text-sm space-y-2">
         <p>&copy; 2026 Ishxa Service. All rights reserved. Powered by Shirogami Ren.</p>
+        <!-- Secret click trigger for PC -->
+        <div>
+            <button onclick="toggleAdminModal()" class="text-gray-700 hover:text-gray-500 transition text-xs" title="Admin Panel"><i class="fas fa-cog"></i></button>
+        </div>
     </footer>
 
     <!-- App Logic Engine -->
