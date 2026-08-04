@@ -55,6 +55,33 @@
         </div>
     </section>
 
+    <!-- Info Banner Section (Tsagiin Huviar & Busad Medeelel) -->
+    <section class="max-w-6xl mx-auto px-4 pt-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Tsagiin Huviar Card -->
+            <div class="bg-cardbg border border-gray-800 p-6 rounded-2xl relative overflow-hidden flex items-start gap-4">
+                <div class="p-3 bg-accent/10 text-accent rounded-xl border border-accent/20">
+                    <i class="fas fa-clock text-xl"></i>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-accent">Цагийн хуваарь (Working Hours)</h3>
+                    <p id="display-schedule" class="text-gray-300 text-sm whitespace-pre-line">Loading...</p>
+                </div>
+            </div>
+
+            <!-- Busad Medeelel Card -->
+            <div class="bg-cardbg border border-gray-800 p-6 rounded-2xl relative overflow-hidden flex items-start gap-4">
+                <div class="p-3 bg-blue-500/10 text-blue-400 rounded-xl border border-blue-500/20">
+                    <i class="fas fa-info-circle text-xl"></i>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-blue-400">Бусад мэдээлэл (Other Info)</h3>
+                    <p id="display-info" class="text-gray-300 text-sm whitespace-pre-line">Loading...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Product Catalog Section -->
     <main id="products" class="max-w-6xl mx-auto px-4 py-12">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
@@ -79,6 +106,22 @@
             <div class="flex justify-between items-center border-b border-gray-800 pb-4">
                 <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-cogs text-accent"></i> Ishxa Service Admin Panel</h3>
                 <button onclick="toggleAdminModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+
+            <!-- Site Info Settings (Tsagiin Huviar & Busad Medeelel) -->
+            <div class="bg-darkbg/50 p-4 rounded-xl border border-gray-800 space-y-4">
+                <h4 class="font-semibold text-accent text-sm uppercase tracking-wider">Edit Site Info (Цагийн хуваарь & Бусад мэдээлэл)</h4>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Цагийн хуваарь (Schedule)</label>
+                        <textarea id="setting-schedule" rows="2" class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="e.g. Даваа - Ням: 09:00 - 23:00"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Бусад мэдээлэл (Other Info / Notices)</label>
+                        <textarea id="setting-info" rows="2" class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="e.g. Баталгаат хугацаа болон бусад анхааруулга..."></textarea>
+                    </div>
+                </div>
+                <button onclick="saveSiteInfoSettings()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 rounded-lg text-sm transition">Update Site Info</button>
             </div>
 
             <!-- Header Button Settings Form -->
@@ -216,7 +259,30 @@
             link: 'https://www.facebook.com'
         };
 
+        let siteInfo = JSON.parse(localStorage.getItem('ishxa_site_info')) || {
+            schedule: 'Даваа - Ням: 09:00 - 23:00 (Бүх өдөр ажиллана)',
+            info: 'Бүх үйлчилгээ болон аккаунт найдвартай, баталгаатай. Төлбөр шилжүүлсний дараа шууд мэдээллээ авна.'
+        };
+
         let currentFilter = 'all';
+
+        function applySiteInfo() {
+            document.getElementById('display-schedule').textContent = siteInfo.schedule;
+            document.getElementById('display-info').textContent = siteInfo.info;
+
+            document.getElementById('setting-schedule').value = siteInfo.schedule;
+            document.getElementById('setting-info').value = siteInfo.info;
+        }
+
+        function saveSiteInfoSettings() {
+            siteInfo = {
+                schedule: document.getElementById('setting-schedule').value.trim(),
+                info: document.getElementById('setting-info').value.trim()
+            };
+            localStorage.setItem('ishxa_site_info', JSON.stringify(siteInfo));
+            applySiteInfo();
+            alert('Site info updated successfully!');
+        }
 
         function applyHeaderSettings() {
             const btn = document.getElementById('header-contact-btn');
@@ -362,7 +428,6 @@
                 return;
             }
             categories = categories.filter(c => c.id !== id);
-            // If current filtered view was deleted, fallback to all
             if(currentFilter === id) {
                 currentFilter = 'all';
             }
@@ -416,6 +481,7 @@
                 renderAdminList();
                 renderAdminCategories();
                 applyHeaderSettings();
+                applySiteInfo();
             }
         }
 
@@ -423,6 +489,7 @@
             renderProducts(category);
         }
 
+        applySiteInfo();
         applyHeaderSettings();
         renderCategories();
         renderProducts('all');
