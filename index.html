@@ -27,7 +27,8 @@
     <header class="sticky top-0 z-50 bg-darkbg/90 backdrop-blur-md border-b border-gray-800">
         <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-2">
-                <span class="text-2xl font-black tracking-wider text-white">ISHXA<span class="text-accent">.</span>SERVICE</span>
+                <!-- Double click logo to open admin panel instantly -->
+                <span class="text-2xl font-black tracking-wider text-white cursor-pointer select-none" ondblclick="toggleAdminModal()" title="Double-click for Admin">ISHXA<span class="text-accent">.</span>SERVICE</span>
             </div>
             <div class="flex items-center space-x-4">
                 <a href="#products" class="text-sm font-medium hover:text-accent transition">Catalog</a>
@@ -68,89 +69,177 @@
             </div>
         </div>
 
-        <!-- Product Grid -->
+        <!-- Dynamic Product Grid -->
         <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            
-            <!-- Item 1: Account -->
-            <div class="product-card bg-cardbg border border-gray-800 rounded-2xl overflow-hidden hover:border-accent/50 transition duration-300 flex flex-col justify-between" data-category="accounts">
-                <div class="p-5 space-y-3">
-                    <div class="flex justify-between items-start">
-                        <span class="bg-blue-500/10 text-blue-400 text-xs font-bold px-2.5 py-1 rounded-md border border-blue-500/20">Account</span>
-                        <span class="text-xl font-black text-accent">₮15,000</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-white">Max Level Blox Fruits Account (V4 Unlocked)</h3>
-                    <p class="text-gray-400 text-sm">Godhuman, Cursed Dual Katana, full loaded. Маш цэвэрхэн аккаунт.</p>
-                </div>
-                <div class="p-5 pt-0">
-                    <a href="https://t.me/yourtelegram?text=I%20want%20to%20buy%20Max%20Level%20Blox%20Fruits%20Account" target="_blank" class="w-full block text-center bg-gray-800 hover:bg-accent hover:text-darkbg text-white font-semibold py-2.5 rounded-xl transition duration-200">
-                        Telegram-аар авах <i class="fas fa-arrow-right ml-1 text-xs"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Item 2: Currency -->
-            <div class="product-card bg-cardbg border border-gray-800 rounded-2xl overflow-hidden hover:border-accent/50 transition duration-300 flex flex-col justify-between" data-category="currency">
-                <div class="p-5 space-y-3">
-                    <div class="flex justify-between items-start">
-                        <span class="bg-yellow-500/10 text-yellow-400 text-xs font-bold px-2.5 py-1 rounded-md border border-yellow-500/20">Currency</span>
-                        <span class="text-xl font-black text-accent">₮5,000</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-white">50M In-Game Cash / Gold Bundle</h3>
-                    <p class="text-gray-400 text-sm">Шууд trade хийгээд өгнө. Fast delivery within 5 mins!</p>
-                </div>
-                <div class="p-5 pt-0">
-                    <a href="https://t.me/yourtelegram?text=I%20want%20to%20buy%2050M%20Cash%20Bundle" target="_blank" class="w-full block text-center bg-gray-800 hover:bg-accent hover:text-darkbg text-white font-semibold py-2.5 rounded-xl transition duration-200">
-                        Telegram-аар авах <i class="fas fa-arrow-right ml-1 text-xs"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Item 3: Item -->
-            <div class="product-card bg-cardbg border border-gray-800 rounded-2xl overflow-hidden hover:border-accent/50 transition duration-300 flex flex-col justify-between" data-category="items">
-                <div class="p-5 space-y-3">
-                    <div class="flex justify-between items-start">
-                        <span class="bg-purple-500/10 text-purple-400 text-xs font-bold px-2.5 py-1 rounded-md border border-purple-500/20">Rare Item</span>
-                        <span class="text-xl font-black text-accent">₮8,500</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-white">Legendary Weapon / Skin Pack</h3>
-                    <p class="text-gray-400 text-sm">Exclusive drop, ховорхон олдох item байгаа.</p>
-                </div>
-                <div class="p-5 pt-0">
-                    <a href="https://t.me/yourtelegram?text=I%20want%20to%20buy%20Legendary%20Weapon" target="_blank" class="w-full block text-center bg-gray-800 hover:bg-accent hover:text-darkbg text-white font-semibold py-2.5 rounded-xl transition duration-200">
-                        Telegram-аар авах <i class="fas fa-arrow-right ml-1 text-xs"></i>
-                    </a>
-                </div>
-            </div>
-
+            <!-- Populated via JavaScript -->
         </div>
     </main>
+
+    <!-- Admin Panel Modal (Hidden by default, opens on double-click) -->
+    <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-cardbg border border-gray-800 w-full max-w-2xl rounded-2xl p-6 space-y-6 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-cogs text-accent"></i> Store Admin Panel</h3>
+                <button onclick="toggleAdminModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+
+            <!-- Add Product Form -->
+            <form id="add-product-form" onsubmit="handleAddNewProduct(event)" class="space-y-4 bg-darkbg/50 p-4 rounded-xl border border-gray-800">
+                <h4 class="font-semibold text-accent text-sm uppercase tracking-wider">Add New Listing</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Title</label>
+                        <input type="text" id="p-title" required class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="e.g. Max Level Account">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Price (e.g. ₮15,000)</label>
+                        <input type="text" id="p-price" required class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="₮15,000">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Category</label>
+                        <select id="p-category" class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none">
+                            <option value="accounts">Accounts</option>
+                            <option value="currency">Currency</option>
+                            <option value="items">Items</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Tag label</label>
+                        <input type="text" id="p-tag" required class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="Account">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Description</label>
+                    <textarea id="p-desc" required rows="2" class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="Item details..."></textarea>
+                </div>
+                <button type="submit" class="w-full bg-accent text-darkbg font-bold py-2.5 rounded-lg hover:bg-accenthover transition">Publish Item</button>
+            </form>
+
+            <!-- Manage Existing Products -->
+            <div>
+                <h4 class="font-semibold text-gray-300 text-sm uppercase tracking-wider mb-3">Manage Listings</h4>
+                <div id="admin-product-list" class="space-y-2">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="border-t border-gray-800 mt-20 py-8 text-center text-gray-500 text-sm">
         <p>&copy; 2026 Ishxa Service. All rights reserved. Powered by Shirogami Ren.</p>
     </footer>
 
-    <!-- Simple Filtering Script -->
+    <!-- App Logic Engine -->
     <script>
-        function filterProducts(category) {
-            const cards = document.querySelectorAll('.product-card');
-            const buttons = document.querySelectorAll('.filter-btn');
+        let products = JSON.parse(localStorage.getItem('ishxa_products')) || [
+            { id: 1, title: 'Max Level Blox Fruits Account (V4 Unlocked)', price: '₮15,000', category: 'accounts', tag: 'Account', desc: 'Godhuman, Cursed Dual Katana, full loaded. Маш цэвэрхэн аккаунт.' },
+            { id: 2, title: '50M In-Game Cash / Gold Bundle', price: '₮5,000', category: 'currency', tag: 'Currency', desc: 'Шууд trade хийгээд өгнө. Fast delivery within 5 mins!' },
+            { id: 3, title: 'Legendary Weapon / Skin Pack', price: '₮8,500', category: 'items', tag: 'Rare Item', desc: 'Exclusive drop, ховорхон олдох item байгаа.' }
+        ];
 
+        function saveAndRender() {
+            localStorage.setItem('ishxa_products', JSON.stringify(products));
+            renderProducts('all');
+            renderAdminList();
+        }
+
+        function renderProducts(filterCategory) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+
+            const filtered = filterCategory === 'all' ? products : products.filter(p => p.category === filterCategory);
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">No items available in this category yet.</div>`;
+                return;
+            }
+
+            filtered.forEach(p => {
+                let badgeColor = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+                if(p.category === 'currency') badgeColor = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+                if(p.category === 'items') badgeColor = 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+
+                const card = document.createElement('div');
+                card.className = "product-card bg-cardbg border border-gray-800 rounded-2xl overflow-hidden hover:border-accent/50 transition duration-300 flex flex-col justify-between";
+                card.innerHTML = `
+                    <div class="p-5 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="${badgeColor} text-xs font-bold px-2.5 py-1 rounded-md border">${p.tag}</span>
+                            <span class="text-xl font-black text-accent">${p.price}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">${p.title}</h3>
+                        <p class="text-gray-400 text-sm">${p.desc}</p>
+                    </div>
+                    <div class="p-5 pt-0">
+                        <a href="https://t.me/yourtelegram?text=I%20want%20to%20buy%20${encodeURIComponent(p.title)}" target="_blank" class="w-full block text-center bg-gray-800 hover:bg-accent hover:text-darkbg text-white font-semibold py-2.5 rounded-xl transition duration-200">
+                            Telegram-аар авах <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderAdminList() {
+            const list = document.getElementById('admin-product-list');
+            list.innerHTML = '';
+            products.forEach(p => {
+                const row = document.createElement('div');
+                row.className = "flex items-center justify-between bg-darkbg p-3 rounded-lg border border-gray-800 text-sm";
+                row.innerHTML = `
+                    <div class="truncate pr-4">
+                        <span class="text-white font-medium">${p.title}</span>
+                        <span class="text-accent ml-2">${p.price}</span>
+                    </div>
+                    <button onclick="deleteProduct(${p.id})" class="text-red-400 hover:text-red-300 px-2 py-1"><i class="fas fa-trash"></i></button>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        function handleAddNewProduct(e) {
+            e.preventDefault();
+            const newP = {
+                id: Date.now(),
+                title: document.getElementById('p-title').value,
+                price: document.getElementById('p-price').value,
+                category: document.getElementById('p-category').value,
+                tag: document.getElementById('p-tag').value,
+                desc: document.getElementById('p-desc').value
+            };
+            products.push(newP);
+            saveAndRender();
+            document.getElementById('add-product-form').reset();
+        }
+
+        function deleteProduct(id) {
+            products = products.filter(p => p.id !== id);
+            saveAndRender();
+        }
+
+        function toggleAdminModal() {
+            const modal = document.getElementById('admin-modal');
+            modal.classList.toggle('hidden');
+            if(!modal.classList.contains('hidden')) {
+                renderAdminList();
+            }
+        }
+
+        function filterProducts(category) {
+            const buttons = document.querySelectorAll('.filter-btn');
             buttons.forEach(btn => {
                 btn.classList.remove('bg-accent', 'text-darkbg');
                 btn.classList.add('bg-cardbg', 'text-gray-300');
             });
             event.target.classList.remove('bg-cardbg', 'text-gray-300');
             event.target.classList.add('bg-accent', 'text-darkbg');
-
-            cards.forEach(card => {
-                if (category === 'all' || card.dataset.category === category) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+            renderProducts(category);
         }
+
+        renderProducts('all');
     </script>
 </body>
 </html>
