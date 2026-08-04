@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ishxa Service | Premium Gaming Store</title>
+    <title>Ishxa Service | Premium Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -44,10 +44,10 @@
     <section class="relative overflow-hidden py-16 px-4 text-center border-b border-gray-800/50">
         <div class="max-w-3xl mx-auto space-y-4">
             <span class="inline-block bg-accent/10 text-accent text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-widest border border-accent/20">
-                Trusted Gaming Marketplace
+                Trusted Online Marketplace
             </span>
             <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white">
-                Accounts, Currency & Rare Items
+                Accounts, Services & Digital Goods
             </h1>
             <p class="text-gray-400 text-base sm:text-lg max-w-xl mx-auto">
                 Instant delivery, safe & trusted service. Юу хүссэнээ найдвартай аваарай! Fast and secure.
@@ -61,12 +61,9 @@
             <h2 class="text-2xl font-bold text-white flex items-center gap-2">
                 <i class="fas fa-store text-accent"></i> Available Offers / Боломжит бараанууд
             </h2>
-            <!-- Filter Pills -->
-            <div class="flex flex-wrap gap-2">
-                <button onclick="filterProducts('all')" class="filter-btn px-4 py-1.5 rounded-lg text-sm font-medium bg-accent text-darkbg transition">All</button>
-                <button onclick="filterProducts('accounts')" class="filter-btn px-4 py-1.5 rounded-lg text-sm font-medium bg-cardbg hover:bg-gray-800 text-gray-300 transition">Accounts</button>
-                <button onclick="filterProducts('currency')" class="filter-btn px-4 py-1.5 rounded-lg text-sm font-medium bg-cardbg hover:bg-gray-800 text-gray-300 transition">Currency</button>
-                <button onclick="filterProducts('items')" class="filter-btn px-4 py-1.5 rounded-lg text-sm font-medium bg-cardbg hover:bg-gray-800 text-gray-300 transition">Items</button>
+            <!-- Dynamic Filter Pills -->
+            <div id="filter-container" class="flex flex-wrap gap-2">
+                <!-- Populated via JavaScript -->
             </div>
         </div>
 
@@ -80,7 +77,7 @@
     <div id="admin-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-cardbg border border-gray-800 w-full max-w-2xl rounded-2xl p-6 space-y-6 max-h-[90vh] overflow-y-auto shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-800 pb-4">
-                <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-cogs text-accent"></i> Store Admin Panel</h3>
+                <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-cogs text-accent"></i> Ishxa Service Admin Panel</h3>
                 <button onclick="toggleAdminModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
             </div>
 
@@ -100,6 +97,19 @@
                 <button onclick="saveHeaderSettings()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 rounded-lg text-sm transition">Update Header Button</button>
             </div>
 
+            <!-- Manage Categories Section -->
+            <div class="bg-darkbg/50 p-4 rounded-xl border border-gray-800 space-y-4">
+                <h4 class="font-semibold text-accent text-sm uppercase tracking-wider">Manage Categories</h4>
+                <form onsubmit="handleAddNewCategory(event)" class="flex gap-2">
+                    <input type="text" id="new-cat-id" required placeholder="id (e.g. boosting)" class="w-1/3 bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none">
+                    <input type="text" id="new-cat-name" required placeholder="Display Name (e.g. Boosting)" class="w-2/3 bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none">
+                    <button type="submit" class="bg-accent text-darkbg font-bold px-4 py-2 rounded-lg text-sm hover:bg-accenthover transition whitespace-nowrap">Add</button>
+                </form>
+                <div id="admin-category-list" class="space-y-2 mt-3">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
             <!-- Add Product Form -->
             <form id="add-product-form" onsubmit="handleAddNewProduct(event)" class="space-y-4 bg-darkbg/50 p-4 rounded-xl border border-gray-800">
                 <h4 class="font-semibold text-accent text-sm uppercase tracking-wider">Add New Listing</h4>
@@ -117,9 +127,7 @@
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Category</label>
                         <select id="p-category" class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none">
-                            <option value="accounts">Accounts</option>
-                            <option value="currency">Currency</option>
-                            <option value="items">Items</option>
+                            <!-- Populated dynamically -->
                         </select>
                     </div>
                     <div>
@@ -164,6 +172,12 @@
 
     <!-- App Logic Engine -->
     <script>
+        let categories = JSON.parse(localStorage.getItem('ishxa_categories')) || [
+            { id: 'accounts', name: 'Accounts' },
+            { id: 'currency', name: 'Currency' },
+            { id: 'items', name: 'Items' }
+        ];
+
         let products = JSON.parse(localStorage.getItem('ishxa_products')) || [
             { 
                 id: 1, 
@@ -202,13 +216,14 @@
             link: 'https://www.facebook.com'
         };
 
+        let currentFilter = 'all';
+
         function applyHeaderSettings() {
             const btn = document.getElementById('header-contact-btn');
             btn.innerHTML = headerSettings.text;
             btn.href = headerSettings.link;
 
             document.getElementById('setting-btn-link').value = headerSettings.link;
-            // Strip HTML tags for clean editing in input field
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = headerSettings.text;
             document.getElementById('setting-btn-text').value = tempDiv.textContent.trim() || 'Facebook';
@@ -218,7 +233,6 @@
             const rawText = document.getElementById('setting-btn-text').value;
             const link = document.getElementById('setting-btn-link').value;
             
-            // Keep facebook icon if it says facebook, otherwise regular text
             let iconHtml = '<i class="fab fa-facebook-f mr-1"></i> ';
             if(!rawText.toLowerCase().includes('facebook')) {
                 iconHtml = '';
@@ -236,11 +250,43 @@
 
         function saveAndRender() {
             localStorage.setItem('ishxa_products', JSON.stringify(products));
-            renderProducts('all');
+            localStorage.setItem('ishxa_categories', JSON.stringify(categories));
+            renderCategories();
+            renderProducts(currentFilter);
             renderAdminList();
+            renderAdminCategories();
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('filter-container');
+            container.innerHTML = `
+                <button onclick="filterProducts('all')" class="filter-btn px-4 py-1.5 rounded-lg text-sm font-medium ${currentFilter === 'all' ? 'bg-accent text-darkbg' : 'bg-cardbg hover:bg-gray-800 text-gray-300'} transition">All</button>
+            `;
+
+            categories.forEach(cat => {
+                const isActive = currentFilter === cat.id;
+                const btn = document.createElement('button');
+                btn.onclick = () => filterProducts(cat.id);
+                btn.className = `filter-btn px-4 py-1.5 rounded-lg text-sm font-medium ${isActive ? 'bg-accent text-darkbg' : 'bg-cardbg hover:bg-gray-800 text-gray-300'} transition`;
+                btn.textContent = cat.name;
+                container.appendChild(btn);
+            });
+
+            // Update category select dropdown in admin form
+            const select = document.getElementById('p-category');
+            select.innerHTML = '';
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.id;
+                opt.textContent = cat.name;
+                select.appendChild(opt);
+            });
         }
 
         function renderProducts(filterCategory) {
+            currentFilter = filterCategory;
+            renderCategories(); // Re-render to update active classes on pills
+
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
 
@@ -275,6 +321,52 @@
                 `;
                 grid.appendChild(card);
             });
+        }
+
+        function renderAdminCategories() {
+            const list = document.getElementById('admin-category-list');
+            list.innerHTML = '';
+            categories.forEach(cat => {
+                const row = document.createElement('div');
+                row.className = "flex items-center justify-between bg-darkbg p-3 rounded-lg border border-gray-800 text-sm";
+                row.innerHTML = `
+                    <div class="truncate pr-4">
+                        <span class="text-white font-medium">${cat.name}</span>
+                        <span class="text-gray-500 ml-2 text-xs">(${cat.id})</span>
+                    </div>
+                    <button onclick="deleteCategory('${cat.id}')" class="text-red-400 hover:text-red-300 px-2 py-1"><i class="fas fa-trash"></i></button>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        function handleAddNewCategory(e) {
+            e.preventDefault();
+            const idInput = document.getElementById('new-cat-id').value.trim().toLowerCase().replace(/\s+/g, '-');
+            const nameInput = document.getElementById('new-cat-name').value.trim();
+
+            if(categories.some(c => c.id === idInput)) {
+                alert('Category ID already exists!');
+                return;
+            }
+
+            categories.push({ id: idInput, name: nameInput });
+            saveAndRender();
+            document.getElementById('new-cat-id').value = '';
+            document.getElementById('new-cat-name').value = '';
+        }
+
+        function deleteCategory(id) {
+            if(categories.length <= 1) {
+                alert('You must keep at least one category!');
+                return;
+            }
+            categories = categories.filter(c => c.id !== id);
+            // If current filtered view was deleted, fallback to all
+            if(currentFilter === id) {
+                currentFilter = 'all';
+            }
+            saveAndRender();
         }
 
         function renderAdminList() {
@@ -322,22 +414,17 @@
             modal.classList.toggle('hidden');
             if(!modal.classList.contains('hidden')) {
                 renderAdminList();
+                renderAdminCategories();
                 applyHeaderSettings();
             }
         }
 
         function filterProducts(category) {
-            const buttons = document.querySelectorAll('.filter-btn');
-            buttons.forEach(btn => {
-                btn.classList.remove('bg-accent', 'text-darkbg');
-                btn.classList.add('bg-cardbg', 'text-gray-300');
-            });
-            event.target.classList.remove('bg-cardbg', 'text-gray-300');
-            event.target.classList.add('bg-accent', 'text-darkbg');
             renderProducts(category);
         }
 
         applyHeaderSettings();
+        renderCategories();
         renderProducts('all');
     </script>
 </body>
