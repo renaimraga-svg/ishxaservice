@@ -31,8 +31,8 @@
             </div>
             <div class="flex items-center space-x-4">
                 <a href="#products" class="text-sm font-medium hover:text-accent transition">Catalog</a>
-                <a href="https://t.me/yourtelegram" target="_blank" class="bg-accent text-darkbg font-bold px-4 py-2 rounded-lg text-sm hover:bg-accenthover transition shadow-lg shadow-accent/20">
-                    <i class="fab fa-telegram-plane mr-1"></i> Contact
+                <a href="https://www.facebook.com" target="_blank" class="bg-accent text-darkbg font-bold px-4 py-2 rounded-lg text-sm hover:bg-accenthover transition shadow-lg shadow-accent/20">
+                    <i class="fab fa-facebook-f mr-1"></i> Facebook
                 </a>
             </div>
         </div>
@@ -109,6 +109,16 @@
                         <input type="text" id="p-tag" required class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="Account">
                     </div>
                 </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Contact Link (Facebook page URL, etc.)</label>
+                        <input type="url" id="p-link" required class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="https://facebook.com/yourpage">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Buy Button Text</label>
+                        <input type="text" id="p-btntext" required value="Facebook-ээр авах ➔" class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="Facebook-ээр авах ➔">
+                    </div>
+                </div>
                 <div>
                     <label class="block text-xs text-gray-400 mb-1">Description</label>
                     <textarea id="p-desc" required rows="2" class="w-full bg-darkbg border border-gray-800 rounded-lg px-3 py-2 text-sm text-white focus:border-accent outline-none" placeholder="Item details..."></textarea>
@@ -129,7 +139,6 @@
     <!-- Footer -->
     <footer class="border-t border-gray-800 mt-20 py-8 text-center text-gray-500 text-sm space-y-2">
         <p>&copy; 2026 Ishxa Service. All rights reserved. Powered by Shirogami Ren.</p>
-        <!-- Secret click trigger for PC -->
         <div>
             <button onclick="toggleAdminModal()" class="text-gray-700 hover:text-gray-500 transition text-xs" title="Admin Panel"><i class="fas fa-cog"></i></button>
         </div>
@@ -138,9 +147,36 @@
     <!-- App Logic Engine -->
     <script>
         let products = JSON.parse(localStorage.getItem('ishxa_products')) || [
-            { id: 1, title: 'Max Level Blox Fruits Account (V4 Unlocked)', price: '₮15,000', category: 'accounts', tag: 'Account', desc: 'Godhuman, Cursed Dual Katana, full loaded. Маш цэвэрхэн аккаунт.' },
-            { id: 2, title: '50M In-Game Cash / Gold Bundle', price: '₮5,000', category: 'currency', tag: 'Currency', desc: 'Шууд trade хийгээд өгнө. Fast delivery within 5 mins!' },
-            { id: 3, title: 'Legendary Weapon / Skin Pack', price: '₮8,500', category: 'items', tag: 'Rare Item', desc: 'Exclusive drop, ховорхон олдох item байгаа.' }
+            { 
+                id: 1, 
+                title: 'Max Level Blox Fruits Account (V4 Unlocked)', 
+                price: '₮15,000', 
+                category: 'accounts', 
+                tag: 'Account', 
+                desc: 'Godhuman, Cursed Dual Katana, full loaded. Маш цэвэрхэн аккаунт.',
+                link: 'https://www.facebook.com',
+                btnText: 'Facebook-ээр авах ➔'
+            },
+            { 
+                id: 2, 
+                title: '50M In-Game Cash / Gold Bundle', 
+                price: '₮5,000', 
+                category: 'currency', 
+                tag: 'Currency', 
+                desc: 'Шууд trade хийгээд өгнө. Fast delivery within 5 mins!',
+                link: 'https://www.facebook.com',
+                btnText: 'Facebook-ээр авах ➔'
+            },
+            { 
+                id: 3, 
+                title: 'Legendary Weapon / Skin Pack', 
+                price: '₮8,500', 
+                category: 'items', 
+                tag: 'Rare Item', 
+                desc: 'Exclusive drop, ховорхон олдох item байгаа.',
+                link: 'https://www.facebook.com',
+                btnText: 'Facebook-ээр авах ➔'
+            }
         ];
 
         function saveAndRender() {
@@ -177,8 +213,8 @@
                         <p class="text-gray-400 text-sm">${p.desc}</p>
                     </div>
                     <div class="p-5 pt-0">
-                        <a href="https://t.me/yourtelegram?text=I%20want%20to%20buy%20${encodeURIComponent(p.title)}" target="_blank" class="w-full block text-center bg-gray-800 hover:bg-accent hover:text-darkbg text-white font-semibold py-2.5 rounded-xl transition duration-200">
-                            Telegram-аар авах <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                        <a href="${p.link || '#'}" target="_blank" class="w-full block text-center bg-gray-800 hover:bg-accent hover:text-darkbg text-white font-semibold py-2.5 rounded-xl transition duration-200">
+                            ${p.btnText || 'Buy Now'}
                         </a>
                     </div>
                 `;
@@ -211,11 +247,14 @@
                 price: document.getElementById('p-price').value,
                 category: document.getElementById('p-category').value,
                 tag: document.getElementById('p-tag').value,
+                link: document.getElementById('p-link').value,
+                btnText: document.getElementById('p-btntext').value,
                 desc: document.getElementById('p-desc').value
             };
             products.push(newP);
             saveAndRender();
             document.getElementById('add-product-form').reset();
+            document.getElementById('p-btntext').value = 'Facebook-ээр авах ➔';
         }
 
         function deleteProduct(id) {
