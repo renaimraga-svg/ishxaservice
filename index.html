@@ -6,6 +6,8 @@
     <title>Ishxa Service | Premium Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Include Supabase JS SDK via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -206,46 +208,20 @@
         </div>
     </footer>
 
-    <!-- App Logic Engine -->
+    <!-- App Logic Engine Integrated with Supabase -->
     <script>
+        const SUPABASE_URL = 'https://bifyxphdpxwdrnidvvph.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_kpZrU9svyqLphNNV0AzdNA_J7-CR5ms';
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         let categories = JSON.parse(localStorage.getItem('ishxa_categories')) || [
             { id: 'accounts', name: 'Accounts' },
             { id: 'currency', name: 'Currency' },
             { id: 'items', name: 'Items' }
         ];
 
-        let products = JSON.parse(localStorage.getItem('ishxa_products')) || [
-            { 
-                id: 1, 
-                title: 'Max Level Blox Fruits Account (V4 Unlocked)', 
-                price: '₮15,000', 
-                category: 'accounts', 
-                tag: 'Account', 
-                desc: 'Godhuman, Cursed Dual Katana, full loaded. Маш цэвэрхэн аккаунт.',
-                link: 'https://www.facebook.com',
-                btnText: 'Facebook-ээр авах ➔'
-            },
-            { 
-                id: 2, 
-                title: '50M In-Game Cash / Gold Bundle', 
-                price: '₮5,000', 
-                category: 'currency', 
-                tag: 'Currency', 
-                desc: 'Шууд trade хийгээд өгнө. Fast delivery within 5 mins!',
-                link: 'https://www.facebook.com',
-                btnText: 'Facebook-ээр авах ➔'
-            },
-            { 
-                id: 3, 
-                title: 'Legendary Weapon / Skin Pack', 
-                price: '₮8,500', 
-                category: 'items', 
-                tag: 'Rare Item', 
-                desc: 'Exclusive drop, ховорхон олдох item байгаа.',
-                link: 'https://www.facebook.com',
-                btnText: 'Facebook-ээр авах ➔'
-            }
-        ];
+        let products = [];
 
         let headerSettings = JSON.parse(localStorage.getItem('ishxa_header')) || {
             text: '<i class="fab fa-facebook-f mr-1"></i> Facebook',
@@ -268,6 +244,27 @@
         ];
 
         let currentFilter = 'all';
+
+        // Fetch products from Supabase on load
+        async function fetchProductsFromSupabase() {
+            const { data, error } = await supabaseClient.from('ishxa_products').select('*');
+            if (error) {
+                console.error('Error fetching products:', error);
+            } else if (data) {
+                products = data.map(item => ({
+                    id: item.id,
+                    title: item.title,
+                    price: item.price,
+                    category: item.category,
+                    tag: item.tag,
+                    desc: item.desc,
+                    link: item.link,
+                    btnText: item.btn_text
+                }));
+            }
+            renderProducts(currentFilter);
+            renderAdminList();
+        }
 
         function renderInfoCards() {
             const container = document.getElementById('dynamic-info-container');
@@ -377,15 +374,6 @@
             alert('Header button updated successfully!');
         }
 
-        function saveAndRender() {
-            localStorage.setItem('ishxa_products', JSON.stringify(products));
-            localStorage.setItem('ishxa_categories', JSON.stringify(categories));
-            renderCategories();
-            renderProducts(currentFilter);
-            renderAdminList();
-            renderAdminCategories();
-        }
-
         function renderCategories() {
             const container = document.getElementById('filter-container');
             container.innerHTML = `
@@ -462,38 +450,9 @@
                         <span class="text-white font-medium">${cat.name}</span>
                         <span class="text-gray-500 ml-2 text-xs">(${cat.id})</span>
                     </div>
-                    <button onclick="deleteCategory('${cat.id}')" class="text-red-400 hover:text-red-300 px-2 py-1"><i class="fas fa-trash"></i></button>
                 `;
                 list.appendChild(row);
             });
-        }
-
-        function handleAddNewCategory(e) {
-            e.preventDefault();
-            const idInput = document.getElementById('new-cat-id').value.trim().toLowerCase().replace(/\s+/g, '-');
-            const nameInput = document.getElementById('new-cat-name').value.trim();
-
-            if(categories.some(c => c.id === idInput)) {
-                alert('Category ID already exists!');
-                return;
-            }
-
-            categories.push({ id: idInput, name: nameInput });
-            saveAndRender();
-            document.getElementById('new-cat-id').value = '';
-            document.getElementById('new-cat-name').value = '';
-        }
-
-        function deleteCategory(id) {
-            if(categories.length <= 1) {
-                alert('You must keep at least one category!');
-                return;
-            }
-            categories = categories.filter(c => c.id !== id);
-            if(currentFilter === id) {
-                currentFilter = 'all';
-            }
-            saveAndRender();
         }
 
         function renderAdminList() {
@@ -513,7 +472,7 @@
             });
         }
 
-        function handleAddNewProduct(e) {
+        async function handleAddNewProduct(e) {
             e.preventDefault();
             const newP = {
                 id: Date.now(),
@@ -521,19 +480,30 @@
                 price: document.getElementById('p-price').value,
                 category: document.getElementById('p-category').value,
                 tag: document.getElementById('p-tag').value,
+                desc: document.getElementById('p-desc').value,
                 link: document.getElementById('p-link').value,
-                btnText: document.getElementById('p-btntext').value,
-                desc: document.getElementById('p-desc').value
+                btn_text: document.getElementById('p-btntext').value
             };
-            products.push(newP);
-            saveAndRender();
+
+            const { error } = await supabaseClient.from('ishxa_products').insert([newP]);
+            if (error) {
+                alert('Error saving to Supabase: ' + error.message);
+                return;
+            }
+
+            await fetchProductsFromSupabase();
             document.getElementById('add-product-form').reset();
             document.getElementById('p-btntext').value = 'Facebook-ээр авах ➔';
+            alert('Item published successfully to Supabase!');
         }
 
-        function deleteProduct(id) {
-            products = products.filter(p => p.id !== id);
-            saveAndRender();
+        async function deleteProduct(id) {
+            const { error } = await supabaseClient.from('ishxa_products').delete().eq('id', id);
+            if (error) {
+                alert('Error deleting item: ' + error.message);
+                return;
+            }
+            await fetchProductsFromSupabase();
         }
 
         function toggleAdminModal() {
@@ -551,10 +521,11 @@
             renderProducts(category);
         }
 
+        // Initialize App
         renderInfoCards();
         applyHeaderSettings();
         renderCategories();
-        renderProducts('all');
+        fetchProductsFromSupabase();
     </script>
 </body>
 </html>
